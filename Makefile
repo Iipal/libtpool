@@ -1,25 +1,69 @@
-CC		:=	clang
-CFLAGS	:=	-Wall -Wextra -Werror -I $(CURDIR)/includes
-LDFLAGS	:=	-pthread
+include configs/default_config.mk
 
-SOURCES	:=	$(CURDIR)/srcs/tpool/tpool_add_work.c \
-			$(CURDIR)/srcs/tpool/tpool_create.c \
-			$(CURDIR)/srcs/tpool/tpool_destroy.c \
-			$(CURDIR)/srcs/tpool/tpool_wait.c \
-			$(CURDIR)/Example.c
+.PHONY: all multi $(LIBS_DIRS)
+multi: $(LIBS_DIRS)
+ifneq (,$(filter $(MAKECMDGOALS),debug debug_all))
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS="$(CFLAGS_DEBUG)" all
+else
+ ifneq (,$(filter $(MAKECMDGOALS),sanitize sanitize_all))
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS="$(CFLAGS_SANITIZE)" all
+ else
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) all
+ endif
+endif
 
-OBJECTS	:=	$(SOURCES:.c=.o)
+all: $(NAME)
 
-NAME	:=	Example
+$(NAME): $(OBJS)
+	@$(CC) $(addprefix "-D ",$(DEFINES)) $(CFLAGS) $(CFLAGS_LIBS) $(OBJS) $(LIBS_NAMES) $(IFLAGS) -o $(NAME)
+	@$(MAKE) STATUS
 
-all: $(CURDIR)/$(NAME)
+$(OBJS): %.o: %.c
+	@$(CC) $(addprefix "-D ",$(DEFINES)) -c $(CFLAGS) $(CFLAGS_WARN) $(IFLAGS)  $< -o $@
+	@$(ECHO) " | $@: $(MSG_SUCCESS)"
 
-$(CURDIR)/$(NAME): $(OBJECTS)
+$(LIBS_DIRS):
+ifneq ($(MAKECMDGOALS),pre)
+	@$(MAKE) -C $@ $(MAKECMDGOALS)
+endif
 
-clean:
-	rm -f $(OBJECTS)
+STATUS:
+	@$(ECHO) "/ compiled: $(NAME) $(MSG_SUCCESS)"
+ifneq (,$(DEFINES))
+	@$(ECHO) "| defines: $(DEFINES)"
+endif
+	@$(ECHO) "| compiler default flags: $(CLR_UNDERLINE)$(CFLAGS_WARN)$(CLR_WHITE)"
+	@$(ECHO) "_ compiler optional flags: $(CLR_UNDERLINE)$(CFLAGS)$(CLR_WHITE)"
 
-fclean: clean
-	rm -f $(NAME)
+debug_all: fclean multi
+debug: multi
 
-re: fclean all
+sanitize_all: fclean multi
+sanitize: multi
+
+del:
+	@$(DEL) $(OBJS)
+	@$(DEL) $(NAME)
+del_libs:
+	@$(DEL) $(LIBS_NAMES)
+
+pre: del multi
+re: del del_libs multi
+
+clean: $(LIBS_DIRS)
+	@$(DEL) $(OBJS)
+	@$(ECHO) " | $(CLR_INVERT)deleted$(CLR_WHITE): $(NPWD) source objects"
+fclean: clean $(LIBS_DIRS)
+	@$(DEL) $(NAME)
+	@$(ECHO) " | $(CLR_INVERT)deleted$(CLR_WHITE): $(NPWD)"
+
+norme:
+	@$(ECHO) "$(CLR_INVERT)norminette$(CLR_WHITE) for $(NPWD):"
+	@norminette includes/
+	@norminette $(SRCS)
+
+norme_all:
+	@$(foreach L_DIRS,$(LIBS_DIRS),$(MAKE) -C $(L_DIRS) norme;)
+	@$(MAKE) norme
+
+.PHONY: re fclean clean norme del pre sanitize sanitize_all debug debug_all STATUS
