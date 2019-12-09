@@ -1,20 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   tpool_create.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: dshepele <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/14 21:27:39 by dshepele          #+#    #+#             */
-/*   Updated: 2019/11/14 21:27:39 by dshepele         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#if !defined(IMPLEMETNATION) && !defined(DECLARATION)
-# define IMPLEMETNATION
-# define DECLARATION
-# include "thread_pool.h"
-#endif
+#include "tpool.h"
 
 static struct s_tpool_work __attribute__((__nonnull__(1)))
 	*tpool_work_get(struct s_tpool *restrict tm)
@@ -86,8 +70,3 @@ struct s_tpool
 	}
 	return (tm);
 }
-
-#if defined(IMPLEMETNATION) && defined(DECLARATION)
-# undef IMPLEMETNATION
-# undef DECLARATION
-#endif
