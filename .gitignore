@@ -1,0 +1,7 @@
+.vscode/
+.VScode/
+**.o
+**.a
+**.DS_Store
+test/
+ft_ls
