@@ -13,8 +13,9 @@ CFLAGS_LIBS := -lpthread
 
 CFLAGS := $(CFLAGS_OPTIMIZE)
 
-ifneq (,$(wildcard ./includes))
-IFLAGS := $(addprefix -I,$(shell find ./includes -type d))
+I_PATHS := $(shell find . -name "includes" 2> /dev/null)
+ifneq (,$(I_PATHS))
+IFLAGS := $(addprefix -I,$(foreach ip,$(I_PATHS),$(shell find $(ip) -type d)))
 endif
 
 ifneq (,$(wildcard ./srcs))
