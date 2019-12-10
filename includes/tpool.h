@@ -7,19 +7,31 @@
 # include <stddef.h>
 # include <pthread.h>
 # include <assert.h>
+
 # if defined(__APPLE__)
 #  include <stdlib.h>
 # else
 #  include <malloc.h>
 # endif
+
 # include <stdbool.h>
 # pragma GCC diagnostic warning "-Wredundant-decls"
 # pragma GCC diagnostic ignored "-Wpadded"
 # pragma GCC diagnostic warning "-Wlong-long"
 
+# ifndef S_TPOOL_WORK
+#  define S_TPOOL_WORK
+struct					s_tpool_work
+{
+	void							(*func)(void*);
+	void				*restrict	arg;
+	struct s_tpool_work	*restrict	next;
+};
+# endif
+
 # ifndef S_TPOOL
 #  define S_TPOOL
-struct								s_tpool
+struct					s_tpool
 {
 	struct s_tpool_work *restrict	work_first;
 	struct s_tpool_work *restrict	work_last;
@@ -31,24 +43,13 @@ struct								s_tpool
 	_Bool							stop;
 	char							stub[7];
 };
-#  endif
-
-# ifndef S_TPOOL_WORK
-#  define S_TPOOL_WORK
-struct								s_tpool_work
-{
-	void							(*func)(void*);
-	void				*restrict	arg;
-	struct s_tpool_work	*restrict	next;
-};
 # endif
 
-
-extern struct s_tpool				*tpool_create(const size_t num);
-extern void							tpool_destroy(struct s_tpool *restrict tm);
-extern _Bool						tpool_add_work(struct s_tpool *restrict tm,
-										void (*func)(void*),
-										void *arg);
-extern void							tpool_wait(struct s_tpool *restrict tm);
+extern struct s_tpool	*tpool_create(const size_t n_threads);
+extern void				tpool_destroy(struct s_tpool *restrict tm);
+extern _Bool			tpool_add_work(struct s_tpool *restrict tm,
+							void (*routine)(void*),
+							void *arg);
+extern void				tpool_wait(struct s_tpool *restrict tm);
 
 #endif

@@ -1,7 +1,7 @@
 #include "tpool.h"
 
 static struct s_tpool_work __attribute__((__nonnull__(1)))
-	*tpool_work_get(struct s_tpool *restrict tm)
+	*in_tpool_work_get(struct s_tpool *restrict tm)
 {
 	struct s_tpool_work *restrict	work;
 
@@ -20,7 +20,7 @@ static struct s_tpool_work __attribute__((__nonnull__(1)))
 }
 
 static void __attribute__((,))
-	*tpool_worker(struct s_tpool *restrict tm)
+	*in_tpool_worker(struct s_tpool *restrict tm)
 {
 	struct s_tpool_work *restrict	work;
 
@@ -31,7 +31,7 @@ static void __attribute__((,))
 			break ;
 		if (tm->work_first == NULL)
 			pthread_cond_wait(&(tm->work_cond), &(tm->work_mutex));
-		work = tpool_work_get(tm);
+		work = in_tpool_work_get(tm);
 		tm->working_cnt++;
 		pthread_mutex_unlock(&(tm->work_mutex));
 		if (!!work)
@@ -50,22 +50,22 @@ static void __attribute__((,))
 }
 
 struct s_tpool
-	*tpool_create(const size_t num)
+	*tpool_create(const size_t n_threads)
 {
 	struct s_tpool	*restrict	tm;
 	pthread_t					thread;
 	size_t						i;
 
-	assert(!!num);
+	assert(!!n_threads);
 	assert((tm = (__typeof__(tm))(valloc(sizeof(*tm)))));
-	*tm = __extension__((struct s_tpool){ .thread_cnt = num });
+	*tm = (struct s_tpool){ .thread_cnt = n_threads };
 	pthread_mutex_init(&(tm->work_mutex), NULL);
 	pthread_cond_init(&(tm->work_cond), NULL);
 	pthread_cond_init(&(tm->working_cond), NULL);
 	i = ~0UL;
-	while (++i != num)
+	while (++i != n_threads)
 	{
-		pthread_create(&thread, NULL, (void*(*)(void*))tpool_worker, tm);
+		pthread_create(&thread, NULL, (void*(*)(void*))in_tpool_worker, tm);
 		pthread_detach(thread);
 	}
 	return (tm);

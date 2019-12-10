@@ -1,26 +1,24 @@
 #include "tpool.h"
 
 static struct s_tpool_work __attribute__((__nonnull__(1)))
-	*tpool_work_create(void (*func)(void*),
+	*in_tpool_work_create(void (*routine)(void*),
 						void *restrict arg)
 {
 	struct s_tpool_work	*restrict	work;
 
 	assert((work = (__typeof__(work))(valloc(sizeof(*work)))));
-	*work = (struct s_tpool_work){
-		.func = func,
-		.arg = arg };
+	*work = (struct s_tpool_work){ .func = routine, .arg = arg };
 	return ((struct s_tpool_work*)work);
 }
 
 _Bool __attribute__((__nonnull__(1,2)))
 	tpool_add_work(struct s_tpool *restrict tm,
-					void (*func)(void*),
+					void (*routine)(void*),
 					void *arg)
 {
 	struct s_tpool_work	*restrict	work;
 
-	if (!(work = tpool_work_create(func, arg)))
+	if (!(work = in_tpool_work_create(routine, arg)))
 		return (false);
 	pthread_mutex_lock(&(tm->work_mutex));
 	if (!(tm->work_first))
