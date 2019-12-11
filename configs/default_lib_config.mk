@@ -1,4 +1,4 @@
-NAME := $(notdir $(CURDIR))
+NAME := $(notdir $(CURDIR)).a
 NPWD := $(CURDIR)/$(NAME)
 
 CC := clang
@@ -9,13 +9,10 @@ CFLAGS_DEBUG := -glldb
 CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -fsanitize=address
 CFLAGS_OPTIMIZE := -march=native -mtune=native -Ofast -pipe -flto -fpic
 
-CFLAGS_LIBS := -lpthread
-
 CFLAGS := $(CFLAGS_OPTIMIZE)
 
-I_PATHS := $(shell find . -name "includes" 2> /dev/null)
-ifneq (,$(I_PATHS))
-IFLAGS := $(addprefix -I,$(foreach ip,$(I_PATHS),$(shell find $(ip) -type d)))
+ifneq (,$(wildcard ./includes))
+IFLAGS := $(addprefix -I,$(shell find ./includes -type d))
 endif
 
 ifneq (,$(wildcard ./srcs))
@@ -23,15 +20,13 @@ SRCS := $(shell find srcs -name "*.c")
 OBJS := $(SRCS:.c=.o)
 endif
 
-ifneq (,$(wildcard ./libs))
-LIBS_DIRS := $(shell find ./libs -maxdepth 1 -type d)
-LIBS_DIRS := $(filter-out $(firstword $(LIBS_DIRS)), $(LIBS_DIRS))
-LIBS_NAMES = $(join $(LIBS_DIRS),$(addsuffix .a,$(addprefix /,$(notdir $(LIBS_DIRS)))))
-endif
-
 ECHO := echo
 MAKE := make
 DEL := rm -rf
+
+NPROCS := 1
+
+ARFLAGS = -rcs
 
 UNAME_S := $(shell uname -s)
 # Linux Specifications:
@@ -42,19 +37,21 @@ ECHO += -e
 
 NPROCS := $(shell grep -c ^processor /proc/cpuinfo)
 MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
+AR := llvm-ar
 endif
 
 # MacOS Specifications:
 ifeq ($(UNAME_S),Darwin)
 # Only for MacOS where brew install path on home directory
 #  or user don't have enought permissions to install latest version of GNUMake on system globally.
-# Remove this if in your MacOS system already installed GNUMake 4.0.0 or later.
+# Remove this line if in your MacOS system already installed GNUMake 4.0.0 or later.
  ifneq ($(wildcard ~/.brew/bin/gmake),)
 	MAKE := ~/.brew/bin/gmake
 	NPROCS := $(shell sysctl -n hw.ncpu)
 	MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
  endif
 
+AR := ar
 endif
 
 MAKE += --no-print-directory
