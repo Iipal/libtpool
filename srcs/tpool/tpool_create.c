@@ -19,7 +19,7 @@ static struct s_tpool_work __attribute__((__nonnull__(1)))
 	return (work);
 }
 
-static void __attribute__((,))
+static void
 	*in_tpool_worker(struct s_tpool *restrict tm)
 {
 	struct s_tpool_work *restrict	work;

@@ -4,7 +4,7 @@ void __attribute__((__nonnull__(1)))
 	tpool_destroy(struct s_tpool *restrict tm)
 {
 	struct s_tpool_work *restrict	work;
-	// struct s_tpool_work *restrict	work2;
+	struct s_tpool_work *restrict	work2;
 
 	pthread_mutex_lock(&(tm->work_mutex));
 	work = tm->work_first;
