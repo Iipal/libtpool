@@ -50,20 +50,20 @@ static void
 }
 
 struct s_tpool
-	*tpool_create(const size_t n_threads)
+	*tpool_create(const size_t threads_count)
 {
 	struct s_tpool	*restrict	tm;
 	pthread_t					thread;
 	size_t						i;
 
-	assert(!!n_threads);
+	assert(!!threads_count);
 	assert((tm = (__typeof__(tm))(valloc(sizeof(*tm)))));
-	*tm = (struct s_tpool){ .thread_cnt = n_threads };
+	*tm = (struct s_tpool){ .thread_cnt = threads_count };
 	pthread_mutex_init(&(tm->work_mutex), NULL);
 	pthread_cond_init(&(tm->work_cond), NULL);
 	pthread_cond_init(&(tm->working_cond), NULL);
 	i = ~0UL;
-	while (++i != n_threads)
+	while (++i != threads_count)
 	{
 		pthread_create(&thread, NULL, (void*(*)(void*))in_tpool_worker, tm);
 		pthread_detach(thread);
