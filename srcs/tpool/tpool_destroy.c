@@ -8,8 +8,7 @@ void __attribute__((__nonnull__(1)))
 
 	pthread_mutex_lock(&(tpool->work_mutex));
 	work = tpool->work_first;
-	while (!!work)
-	{
+	while (!!work) {
 		work2 = work->next;
 		free(work);
 		work = work2;

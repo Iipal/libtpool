@@ -1,43 +1,39 @@
 #include "tpool.h"
 
 static struct s_tpool_work __attribute__((__nonnull__(1)))
-	*in_tpool_work_get(struct s_tpool *restrict tm)
+	*in_get_work(struct s_tpool *restrict tm)
 {
-	struct s_tpool_work *restrict	work;
+	struct s_tpool_work *restrict	work = tm->work_first;
 
-	if (!(work = tm->work_first))
+	if (!work)
 		return (NULL);
-	if (work->next == NULL)
-	{
+	if (work->next == NULL) {
 		tm->work_first = NULL;
 		tm->work_last = NULL;
-	}
-	else
-	{
+	} else {
 		tm->work_first = work->next;
 	}
 	return (work);
 }
 
 static void
-	*in_tpool_worker(struct s_tpool *restrict tm)
+	*in_worker(struct s_tpool *restrict tm)
 {
 	struct s_tpool_work *restrict	work;
 
-	while (-42)
-	{
+	while (-42) {
 		pthread_mutex_lock(&(tm->work_mutex));
 		if (tm->stop)
 			break ;
 		if (tm->work_first == NULL)
 			pthread_cond_wait(&(tm->work_cond), &(tm->work_mutex));
-		work = in_tpool_work_get(tm);
+		work = in_get_work(tm);
 		tm->working_cnt++;
 		pthread_mutex_unlock(&(tm->work_mutex));
-		if (!!work)
+		if (!!work) {
 			work->func(work->arg);
-		if (!!work)
 			free(work);
+		}
 		pthread_mutex_lock(&(tm->work_mutex));
 		if (!(tm->stop) && !(--(tm->working_cnt)) && !(tm->work_first))
 			pthread_cond_signal(&(tm->working_cond));
@@ -54,7 +50,7 @@ struct s_tpool
 {
 	struct s_tpool	*restrict	tm;
 	pthread_t					thread;
-	size_t						i;
+	size_t						i = ~0UL;
 
 	assert(!!threads_count);
 	assert((tm = (__typeof__(tm))(valloc(sizeof(*tm)))));
@@ -62,10 +58,8 @@ struct s_tpool
 	pthread_mutex_init(&(tm->work_mutex), NULL);
 	pthread_cond_init(&(tm->work_cond), NULL);
 	pthread_cond_init(&(tm->working_cond), NULL);
-	i = ~0UL;
-	while (++i != threads_count)
-	{
-		pthread_create(&thread, NULL, (void*(*)(void*))in_tpool_worker, tm);
+	while (++i != threads_count) {
+		pthread_create(&thread, NULL, (void*(*)(void*))in_worker, tm);
 		pthread_detach(thread);
 	}
 	return (tm);

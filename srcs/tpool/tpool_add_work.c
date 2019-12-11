@@ -21,13 +21,10 @@ _Bool __attribute__((__nonnull__(1,2)))
 	if (!(work = in_tpool_work_create(work_routine, arg)))
 		return (false);
 	pthread_mutex_lock(&(tpool->work_mutex));
-	if (!(tpool->work_first))
-	{
+	if (!(tpool->work_first)) {
 		tpool->work_first = work;
 		tpool->work_last = tpool->work_first;
-	}
-	else
-	{
+	} else {
 		tpool->work_last->next = work;
 		tpool->work_last = work;
 	}
