@@ -49,8 +49,8 @@ struct s_tpool
 	*tpool_create(const size_t threads_count)
 {
 	struct s_tpool	*restrict	tm;
-	pthread_t					thread;
-	size_t						i = ~0UL;
+	pthread_t			thread;
+	size_t				i = ~0UL;
 
 	assert(!!threads_count);
 	assert((tm = (__typeof__(tm))(valloc(sizeof(*tm)))));
