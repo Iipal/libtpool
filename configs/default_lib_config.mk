@@ -3,7 +3,7 @@ NPWD := $(CURDIR)/$(NAME)
 
 CC := clang
 
-CFLAGS_WARN := -Wall -Wextra -Werror -Wunused
+CFLAGS_DEFAULT := -Wall -Wextra -Werror -Wunused -MMD
 
 CFLAGS_DEBUG := -glldb
 CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -fsanitize=address
@@ -18,6 +18,7 @@ endif
 ifneq (,$(wildcard ./srcs))
 SRCS := $(shell find srcs -name "*.c")
 OBJS := $(SRCS:.c=.o)
+DEPS := $(OBJS:.o=.d)
 endif
 
 ECHO := echo
