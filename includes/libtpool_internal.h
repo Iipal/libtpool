@@ -3,7 +3,7 @@
 
 # ifndef LIBTPOOL_INTERNAL
 #  error "include libtpool.h only"
-# endif
+# endif /* LIBTPOOL_INTERNAL */
 
 # include <stdlib.h>
 # include <string.h>
@@ -20,19 +20,7 @@ struct	s_work
 	void	*arg;
 };
 
-# endif
-
-# ifndef S_CURRENT_WORK
-#  define S_CURRENT_WORK
-
-struct	s_current_work
-{
-	struct s_work	work;
-	ptrdiff_t		work_mask_index;
-};
-
-# endif
-
+# endif /* S_WORK */
 
 # ifndef S_TPOOL
 #  define S_TPOOL
@@ -50,7 +38,7 @@ struct	s_tpool
 	int				stop;
 };
 
-# endif
+# endif /* S_TPOOL */
 
 ptrdiff_t __attribute__((__const__))
 internal_get_unbusy_index(const ptrdiff_t busy_works_mask);
