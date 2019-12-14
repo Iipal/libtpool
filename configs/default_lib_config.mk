@@ -4,7 +4,7 @@ NPWD := $(CURDIR)/$(NAME)
 CC := clang
 
 CFLAGS_DEBUG := -glldb
-CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -fsanitize=address
+CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -Og -fsanitize=thread
 CFLAGS_OPTIMIZE := -march=native -mtune=native -Ofast -pipe -flto -fpic
 
 CFLAGS_OPTIONAL := $(CFLAGS_OPTIMIZE)
