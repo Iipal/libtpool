@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   libtpool_internal.h                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tmaluh <marvin@42.fr>                      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/12/11 20:17:57 by tmaluh            #+#    #+#             */
-/*   Updated: 2019/12/11 20:32:23 by tmaluh           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef LIBTPOOL_INTERNAL_H
 # define LIBTPOOL_INTERNAL_H
 
@@ -17,43 +5,56 @@
 #  error "include libtpool.h only"
 # endif
 
-# include <pthread.h>
+# include <stdlib.h>
+# include <string.h>
+# include <stddef.h>
+# include <threads.h>
 # include <assert.h>
 
-# if defined(__APPLE__)
-#  include <stdlib.h>
-# else
-#  include <malloc.h>
-# endif
+# ifndef S_WORK
+#  define S_WORK
 
-# ifndef S_TPOOL_WORK
-#  define S_TPOOL_WORK
-
-struct					s_tpool_work
+struct	s_work
 {
-	void							(*func)(void*);
-	void *restrict					arg;
-	struct s_tpool_work *restrict	next;
+	void	(*routine)(void *restrict);
+	void	*arg;
 };
 
 # endif
+
+# ifndef S_CURRENT_WORK
+#  define S_CURRENT_WORK
+
+struct	s_current_work
+{
+	struct s_work	work;
+	ptrdiff_t		work_mask_index;
+};
+
+# endif
+
 
 # ifndef S_TPOOL
 #  define S_TPOOL
 
-struct					s_tpool
+struct	s_tpool
 {
-	struct s_tpool_work *restrict	work_first;
-	struct s_tpool_work *restrict	work_last;
-	pthread_mutex_t					work_mutex;
-	pthread_cond_t					work_cond;
-	pthread_cond_t					working_cond;
-	size_t							working_cnt;
-	size_t							thread_cnt;
-	_Bool							stop;
-	char							stub[7];
+	struct s_work	*works;
+	ptrdiff_t		busy_works_mask;
+	size_t			works_count;
+	size_t			threads_count;
+	size_t			pool_size;
+	mtx_t			pool_mutex;
+	cnd_t			pool_cond;
+	cnd_t			work_cond;
+	int				stop;
 };
 
 # endif
 
-#endif
+ptrdiff_t __attribute_const__
+internal_get_unbusy_index(const ptrdiff_t busy_works_mask);
+int
+internal_thread_worker(void *restrict arg);
+
+#endif /* LIBTPOOL_INTERNAL_H */

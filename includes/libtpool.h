@@ -1,45 +1,40 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   libtpool.h                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tmaluh <marvin@42.fr>                      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/12/11 20:18:17 by tmaluh            #+#    #+#             */
-/*   Updated: 2019/12/11 20:30:59 by tmaluh           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef LIBTPOOL_H
 # define LIBTPOOL_H
 
-# include <stddef.h>
+# ifndef _GNU_SOURCE
+#  define ONLY_LOCAL_GNU_SOURCE_DEFINE
+#  define _GNU_SOURCE
+# endif
+
 # include <sys/types.h>
 # include <stdbool.h>
 
 struct s_tpool;
 
-/*
-** Creating the threads pool of 'threads_count' threads counts.
-** All created threads in the pool are detached and waiting
-**  until 'tpool_add_work' allocate a new 'work'.
-*/
-extern struct s_tpool	*tpool_create(const size_t threads_count);
+struct s_tpool
+*tpool_create(const size_t threads_count);
 
-/*
-** Deleting all created threads and the tpool.
-*/
-extern void				tpool_destroy(struct s_tpool *restrict tpool);
+bool
+tpool_add_work(struct s_tpool *restrict tpool,
+	void (*work_routine)(void *restrict),
+	void *restrict arg);
 
-/*
-** Allocating new 'work'.
-*/
-extern _Bool			tpool_add_work(struct s_tpool *restrict tpool,
-							void (*work_routine)(void*),
-							void *arg);
-/*
-** Waiting until all threads in the pool done a work.
-*/
-extern void				tpool_wait(struct s_tpool *restrict tpool);
+void
+tpool_wait(struct s_tpool *restrict tpool);
 
-#endif
+void __attribute__((__nonnull__(1)))
+tpool_destroy(struct s_tpool *restrict tpool);
+
+size_t __attribute__((__nonnull__(1)))
+tpool_size(struct s_tpool *restrict tpool);
+size_t __attribute__((__nonnull__(1)))
+tpool_alive(struct s_tpool *restrict tpool);
+size_t __attribute__((__nonnull__(1)))
+tpool_works(struct s_tpool *restrict tpool);
+
+# ifdef ONLY_LOCAL_GNU_SOURCE_DEFINE
+#  undef ONLY_LOCAL_GNU_SOURCE_DEFINE
+#  undef _GNU_SOURCE
+# endif
+
+#endif /* LIBTPOOL_H */

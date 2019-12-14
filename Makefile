@@ -3,10 +3,12 @@ include configs/default_lib_config.mk
 .PHONY: all multi STATUS_START
 multi: STATUS_START
  ifneq (,$(filter $(MAKECMDGOALS),debug debug_all))
-	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS="$(CFLAGS_DEBUG)" DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_DEBUG" all
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_DEBUG)" \
+		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_DEBUG" all
  else
   ifneq (,$(filter $(MAKECMDGOALS),sanitize sanitize_all))
-	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS="$(CFLAGS_SANITIZE)" DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_SANITIZE" all
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_SANITIZE)" \
+		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_SANITIZE" all
   else
 	@$(MAKE) $(MAKE_PARALLEL_FLAGS) all
   endif
@@ -25,21 +27,27 @@ $(NAME): $(OBJS)
 
 -include $(DEPS)
 $(OBJS): %.o: %.c
-	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_DEFAULT) $(IFLAGS) $< -o $@
+	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_OPTIONAL) $(IFLAGS) $< -o $@
 	@$(ECHO) " | $@: $(MSG_SUCCESS)"
 
 STATUS:
-	@$(ECHO) "/"
-	@$(ECHO) "|"
-	@$(ECHO) "| created: $(NAME) $(MSG_SUCCESS)"
- ifneq (,$(DEFINES))
-	@$(ECHO) "| compiler custom defines: $(foreach dfns,$(DEFINES),$(CLR_INVERT)$(dfns)$(CLR_WHITE) )"
+	@$(ECHO) "/ -------------------------"
+ ifneq (,$(NAME))
+	@$(ECHO) "| compiled                : $(NAME) $(MSG_SUCCESS)"
  endif
-	@$(ECHO) "| compiler default flags: $(CFLAGS_DEFAULT)"
-	@$(ECHO) "| compiler optional flags: $(CLR_UNDERLINE)$(CFLAGS)$(CLR_WHITE)"
-	@$(ECHO) "| archiver flags: $(CLR_UNDERLINE)$(ARFLAGS)$(CLR_WHITE)"
-	@$(ECHO) "|"
-	@$(ECHO) "\\"
+ ifneq (,$(DEFINES))
+	@$(ECHO) "| compiler custom defines : $(foreach dfns,$(DEFINES),$(CLR_INVERT)$(dfns)$(CLR_WHITE) )"
+ endif
+ ifneq (,$(CFLAGS))
+	@$(ECHO) "| compiler          flags : $(CFLAGS)"
+ endif
+ ifneq (,$(CFLAGS_OPTIONAL))
+	@$(ECHO) "| compiler optional flags : $(CLR_UNDERLINE)$(CFLAGS_OPTIONAL)$(CLR_WHITE)"
+ endif
+ ifneq (,$(ARFLAGS))
+	@$(ECHO) "| archiver          flags : $(CLR_UNDERLINE)$(ARFLAGS)$(CLR_WHITE)"
+ endif
+	@$(ECHO) "\\ -------------------------"
 
 debug_all: pre
 debug: multi

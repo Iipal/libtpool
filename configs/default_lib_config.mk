@@ -3,13 +3,12 @@ NPWD := $(CURDIR)/$(NAME)
 
 CC := clang
 
-CFLAGS_DEFAULT := -Wall -Wextra -Werror -Wunused -MMD
-
 CFLAGS_DEBUG := -glldb
 CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -fsanitize=address
 CFLAGS_OPTIMIZE := -march=native -mtune=native -Ofast -pipe -flto -fpic
 
-CFLAGS := $(CFLAGS_OPTIMIZE)
+CFLAGS_OPTIONAL := $(CFLAGS_OPTIMIZE)
+CFLAGS := -Wall -Wextra -Werror -Wunused -MMD
 
 ifneq (,$(wildcard ./includes))
 IFLAGS := $(addprefix -I,$(shell find ./includes -type d))
