@@ -40,7 +40,7 @@ struct	s_current_work
 struct	s_tpool
 {
 	struct s_work	*works;
-	ptrdiff_t		busy_works_mask;
+	ptrdiff_t		done_works_mask;
 	size_t			works_count;
 	size_t			threads_count;
 	size_t			pool_size;

@@ -8,7 +8,7 @@ void	tpool_wait(struct s_tpool *restrict tpool)
 {
 	pthread_mutex_lock(&tpool->pool_mutex);
 	while (1) {
-		if ((!tpool->stop && tpool->busy_works_mask)
+		if ((!tpool->stop && tpool->works_count)
 		|| (tpool->stop && tpool->threads_count))
 			pthread_cond_wait(&tpool->pool_cond, &tpool->pool_mutex);
 		else
