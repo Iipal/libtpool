@@ -6,8 +6,7 @@
 
 #include <stdio.h>
 
-static inline struct s_work
-	s_get_work(const struct s_tpool *restrict tpool)
+static struct s_work	s_get_work(struct s_tpool *__restrict tpool)
 {
 	struct s_work	out;
 	size_t			i;
@@ -23,13 +22,11 @@ static inline struct s_work
 	return (out);
 }
 
-void
-	*internal_thread_worker(void *restrict arg)
+void *__nullable	internal_thread_worker(void *__restrict __nonnull arg)
 {
-	struct s_tpool *restrict	tpool = (struct s_tpool *restrict)arg;
+	struct s_tpool *__restrict	tpool = (struct s_tpool *__restrict)arg;
 	struct s_work				work;
 
-	assert(arg);
 	while (1) {
 		pthread_mutex_lock(&tpool->pool_mutex);
 		if (tpool->stop)
