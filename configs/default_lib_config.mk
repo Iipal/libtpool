@@ -6,6 +6,7 @@ CC := clang
 CFLAGS_DEBUG := -glldb
 CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -Og -fsanitize=thread
 CFLAGS_OPTIMIZE := -march=native -mtune=native -Ofast -pipe -flto -fpic
+CFLAGS_ASSEMBLY := $(filter-out -flto,$(CFLAGS_OPTIMIZE)) -S -masm=intel
 
 CFLAGS_OPTIONAL := $(CFLAGS_OPTIMIZE)
 CFLAGS := -Wall -Wextra -Werror -Wunused -MMD
@@ -17,6 +18,7 @@ endif
 ifneq (,$(wildcard ./srcs))
 SRCS := $(shell find srcs -name "*.c")
 OBJS := $(SRCS:.c=.o)
+ASMS := $(OBJS:.o=.s)
 DEPS := $(OBJS:.o=.d)
 endif
 

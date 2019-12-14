@@ -5,13 +5,14 @@ multi: STATUS_START
  ifneq (,$(filter $(MAKECMDGOALS),debug debug_all))
 	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_DEBUG)" \
 		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_DEBUG" all
- else
-  ifneq (,$(filter $(MAKECMDGOALS),sanitize sanitize_all))
+ else ifneq (,$(filter $(MAKECMDGOALS),sanitize sanitize_all))
 	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_SANITIZE)" \
 		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_SANITIZE" all
-  else
+ else ifneq (,$(filter $(MAKECMDGOALS),assembly assembly_all))
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_ASSEMBLY)" ARFLAGS= \
+		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_ASSEMBLY" all
+ else
 	@$(MAKE) $(MAKE_PARALLEL_FLAGS) all
-  endif
  endif
 
 STATUS_START:
@@ -21,19 +22,33 @@ STATUS_START:
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(ASMS)
+ ifneq (,$(ARFLAGS))
 	@$(AR) $(ARFLAGS) $(NAME) $(OBJS)
+ endif
 	@$(MAKE) STATUS
 
 -include $(DEPS)
 $(OBJS): %.o: %.c
+ ifneq (,$(ARFLAGS))
 	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_OPTIONAL) $(IFLAGS) $< -o $@
 	@$(ECHO) " | $@: $(MSG_SUCCESS)"
+ else
+	@echo $< > /dev/null
+ endif
+
+$(ASMS): %.s: %.c
+ ifeq (,$(ARFLAGS))
+	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_OPTIONAL) $(IFLAGS) $< -o $(basename $@).s
+	@$(ECHO) " | $(basename $@).s: $(MSG_SUCCESS)"
+ endif
 
 STATUS:
 	@$(ECHO) "/ -------------------------"
  ifneq (,$(NAME))
+  ifneq (,$(ARFLAGS))
 	@$(ECHO) "| compiled                : $(NAME) $(MSG_SUCCESS)"
+  endif
  endif
  ifneq (,$(DEFINES))
 	@$(ECHO) "| compiler custom defines : $(foreach dfns,$(DEFINES),$(CLR_INVERT)$(dfns)$(CLR_WHITE) )"
@@ -55,8 +70,12 @@ debug: multi
 sanitize_all: pre
 sanitize: multi
 
+assembly_all: pre
+assembly: multi
+
 clean:
 	@$(DEL) $(OBJS)
+	@$(DEL) $(OBJS:.o=.s)
 	@$(ECHO) " | $(CLR_INVERT)deleted$(CLR_WHITE): $(NPWD) source objects"
 fclean: clean
 	@$(DEL) $(NAME)
