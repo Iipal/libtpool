@@ -9,16 +9,7 @@
 # include <pthread.h>
 # include <assert.h>
 
-# ifndef S_WORK
-#  define S_WORK
-
-struct	s_work
-{
-	void	(*__nullable routine)(void *__restrict __nonnull);
-	void	*__restrict __nullable arg;
-};
-
-# endif /* S_WORK */
+# include "libtpool_s_work.h"
 
 # ifndef S_TPOOL
 #  define S_TPOOL

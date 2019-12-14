@@ -6,6 +6,8 @@
 #  define _GNU_SOURCE
 # endif
 
+# include "libtpool_s_work.h"
+
 # include <sys/types.h>
 # include <stdbool.h>
 
@@ -15,9 +17,23 @@ struct s_tpool
 *__nonnull tpool_create(const size_t threads_count);
 
 bool
-tpool_add_work(struct s_tpool *__restrict __nonnull tpool,
+# if __has_attribute(overloadable)
+__attribute__((overloadable)) tpool_add_work
+# else
+tpool_add_work
+# endif
+(struct s_tpool *__restrict __nonnull tpool,
 	void (*__nonnull work_routine)(void *__nonnull),
 	void *__restrict __nonnull arg);
+
+bool
+# if __has_attribute(overloadable)
+__attribute__((overloadable)) tpool_add_work
+# else
+tpool_add_w_work
+# endif
+(struct s_tpool *__restrict __nonnull tpool,
+struct s_work *__restrict __nonnull work);
 
 void
 tpool_wait(struct s_tpool *__restrict __nonnull tpool);

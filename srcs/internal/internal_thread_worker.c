@@ -4,8 +4,6 @@
 # include "libtpool_internal.h"
 #undef LIBTPOOL_INTERNAL
 
-#include <stdio.h>
-
 static struct s_work	s_get_work(struct s_tpool *__restrict tpool)
 {
 	struct s_work	out;
