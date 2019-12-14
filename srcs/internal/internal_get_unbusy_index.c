@@ -4,7 +4,7 @@
 # include "libtpool_internal.h"
 #undef LIBTPOOL_INTERNAL
 
-ptrdiff_t __attribute_const__
+ptrdiff_t __attribute__((__const__))
 	internal_get_unbusy_index(const ptrdiff_t busy_works_mask)
 {
 	ptrdiff_t	i = -1L;

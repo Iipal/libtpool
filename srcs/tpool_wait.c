@@ -6,13 +6,13 @@
 
 void	tpool_wait(struct s_tpool *restrict tpool)
 {
-	mtx_lock(&tpool->pool_mutex);
+	pthread_mutex_lock(&tpool->pool_mutex);
 	while (1) {
 		if ((!tpool->stop && tpool->busy_works_mask)
 		|| (tpool->stop && tpool->threads_count))
-			cnd_wait(&tpool->pool_cond, &tpool->pool_mutex);
+			pthread_cond_wait(&tpool->pool_cond, &tpool->pool_mutex);
 		else
 			break ;
 	}
-	mtx_unlock(&tpool->pool_mutex);
+	pthread_mutex_unlock(&tpool->pool_mutex);
 }

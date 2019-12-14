@@ -8,8 +8,8 @@ size_t	tpool_works(struct s_tpool *restrict tpool)
 {
 	size_t	n;
 
-	mtx_lock(&tpool->pool_mutex);
+	pthread_mutex_lock(&tpool->pool_mutex);
 	n = tpool->works_count;
-	mtx_unlock(&tpool->pool_mutex);
+	pthread_mutex_unlock(&tpool->pool_mutex);
 	return (n);
 }

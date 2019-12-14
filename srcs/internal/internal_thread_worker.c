@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-static struct s_current_work __attribute_pure__
+static struct s_current_work
 	*s_get_work(const struct s_tpool *restrict tpool)
 {
 	struct s_current_work	*out;
@@ -21,35 +21,35 @@ static struct s_current_work __attribute_pure__
 	return (out);
 }
 
-int
-	internal_thread_worker(void *restrict arg)
+void
+	*internal_thread_worker(void *restrict arg)
 {
 	struct s_tpool *restrict		tpool = (struct s_tpool *restrict)arg;
 	struct s_current_work			*c_work;
 
 	while (1) {
-		mtx_lock(&tpool->pool_mutex);
+		pthread_mutex_lock(&tpool->pool_mutex);
 		if (tpool->stop)
 		 	break ;
 		if (!tpool->works_count)
-			cnd_wait(&tpool->work_cond, &tpool->pool_mutex);
+			pthread_cond_wait(&tpool->work_cond, &tpool->pool_mutex);
 		if ((c_work = s_get_work(tpool)))
 			tpool->busy_works_mask |= c_work->work_mask_index;
-		mtx_unlock(&tpool->pool_mutex);
+		pthread_mutex_unlock(&tpool->pool_mutex);
 		if (c_work) {
 			c_work->work.routine(c_work->work.arg);
 			free(c_work);
 			c_work = NULL;
 		}
-		mtx_lock(&tpool->pool_mutex);
+		pthread_mutex_lock(&tpool->pool_mutex);
 		if (tpool->works_count)
 			--tpool->works_count;
 		if (!tpool->stop && !tpool->works_count)
-			cnd_signal(&tpool->pool_cond);
-		mtx_unlock(&tpool->pool_mutex);
+			pthread_cond_signal(&tpool->pool_cond);
+		pthread_mutex_unlock(&tpool->pool_mutex);
 	}
 	tpool->threads_count--;
-	cnd_signal(&tpool->pool_cond);
-	mtx_unlock(&tpool->pool_mutex);
-	return (0);
+	pthread_cond_signal(&tpool->pool_cond);
+	pthread_mutex_unlock(&tpool->pool_mutex);
+	return (NULL);
 }

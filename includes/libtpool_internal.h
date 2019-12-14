@@ -8,7 +8,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <stddef.h>
-# include <threads.h>
+# include <pthread.h>
 # include <assert.h>
 
 # ifndef S_WORK
@@ -44,17 +44,17 @@ struct	s_tpool
 	size_t			works_count;
 	size_t			threads_count;
 	size_t			pool_size;
-	mtx_t			pool_mutex;
-	cnd_t			pool_cond;
-	cnd_t			work_cond;
+	pthread_mutex_t	pool_mutex;
+	pthread_cond_t	pool_cond;
+	pthread_cond_t	work_cond;
 	int				stop;
 };
 
 # endif
 
-ptrdiff_t __attribute_const__
+ptrdiff_t __attribute__((__const__))
 internal_get_unbusy_index(const ptrdiff_t busy_works_mask);
-int
-internal_thread_worker(void *restrict arg);
+void
+*internal_thread_worker(void *restrict arg);
 
 #endif /* LIBTPOOL_INTERNAL_H */

@@ -10,7 +10,7 @@ struct s_tpool
 	*tpool_create(const size_t threads_count)
 {
 	struct s_tpool	*tpool;
-	thrd_t			thread;
+	pthread_t		thread;
 	size_t			i;
 
 	assert(threads_count);
@@ -18,13 +18,13 @@ struct s_tpool
 	*tpool = (struct s_tpool) { .pool_size = threads_count,
 								.threads_count = threads_count };
 	assert((tpool->works = calloc(threads_count, sizeof(*tpool->works))));
-	mtx_init(&tpool->pool_mutex, 0);
-	cnd_init(&tpool->work_cond);
-	cnd_init(&tpool->pool_cond);
+	pthread_mutex_init(&tpool->pool_mutex, NULL);
+	pthread_cond_init(&tpool->work_cond, NULL);
+	pthread_cond_init(&tpool->pool_cond, NULL);
 	i = ~0UL;
 	while (threads_count > ++i) {
-		thrd_create(&thread, internal_thread_worker, tpool);
-		thrd_detach(thread);
+		pthread_create(&thread, NULL, internal_thread_worker, tpool);
+		pthread_detach(thread);
 	}
 	return (tpool);
 }
