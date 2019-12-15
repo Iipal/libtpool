@@ -9,8 +9,11 @@ multi: STATUS_START
 	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_SANITIZE)" \
 		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_SANITIZE" all
  else ifneq (,$(filter $(MAKECMDGOALS),assembly assembly_all))
-	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_ASSEMBLY)" ARFLAGS= \
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_ASSEMBLY)" ASSEMBLY_FLAG=1 \
 		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_ASSEMBLY" all
+ else ifneq (,$(filter $(MAKECMDGOALS),llvm_assembly llvm_assembly_all))
+	@$(MAKE) $(MAKE_PARALLEL_FLAGS) CFLAGS_OPTIONAL="$(CFLAGS_LLVM_ASSEMBLY)" ASSEMBLY_FLAG=2 \
+		DEFINES="$(shell echo $(basename $(NAME)) | tr a-z A-Z)_LLVM_ASSEMBLY" all
  else
 	@$(MAKE) $(MAKE_PARALLEL_FLAGS) all
  endif
@@ -22,31 +25,35 @@ STATUS_START:
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(ASMS)
- ifneq (,$(ARFLAGS))
+$(NAME): $(OBJS) $(ASMS) $(LLVM_ASMS)
+ ifeq (0,$(ASSEMBLY_FLAG))
 	@$(AR) $(ARFLAGS) $(NAME) $(OBJS)
  endif
 	@$(MAKE) STATUS
 
 -include $(DEPS)
 $(OBJS): %.o: %.c
- ifneq (,$(ARFLAGS))
+ ifeq (0,$(ASSEMBLY_FLAG))
 	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_OPTIONAL) $(IFLAGS) $< -o $@
 	@$(ECHO) " | $@: $(MSG_SUCCESS)"
- else
-	@echo $< > /dev/null
  endif
 
 $(ASMS): %.s: %.c
- ifeq (,$(ARFLAGS))
+ ifeq (1,$(ASSEMBLY_FLAG))
 	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_OPTIONAL) $(IFLAGS) $< -o $(basename $@).s
 	@$(ECHO) " | $(basename $@).s: $(MSG_SUCCESS)"
+ endif
+
+$(LLVM_ASMS): %.ll: %.c
+ ifeq (2,$(ASSEMBLY_FLAG))
+	@$(CC) $(addprefix -D,$(DEFINES)) -c $(CFLAGS) $(CFLAGS_OPTIONAL) $(IFLAGS) $< -o $(basename $@).ll
+	@$(ECHO) " | $(basename $@).ll: $(MSG_SUCCESS)"
  endif
 
 STATUS:
 	@$(ECHO) "/ -------------------------"
  ifneq (,$(NAME))
-  ifneq (,$(ARFLAGS))
+  ifeq (0,$(ASSEMBLY_FLAG))
 	@$(ECHO) "| compiled                : $(NAME) $(MSG_SUCCESS)"
   endif
  endif
@@ -60,7 +67,9 @@ STATUS:
 	@$(ECHO) "| compiler optional flags : $(CLR_UNDERLINE)$(CFLAGS_OPTIONAL)$(CLR_WHITE)"
  endif
  ifneq (,$(ARFLAGS))
+  ifeq (0,$(ASSEMBLY_FLAG))
 	@$(ECHO) "| archiver          flags : $(CLR_UNDERLINE)$(ARFLAGS)$(CLR_WHITE)"
+  endif
  endif
 	@$(ECHO) "\\ -------------------------"
 
@@ -73,9 +82,14 @@ sanitize: multi
 assembly_all: pre
 assembly: multi
 
+llvm_assembly_all: pre
+llvm_assembly: multi
+
 clean:
 	@$(DEL) $(OBJS)
-	@$(DEL) $(OBJS:.o=.s)
+	@$(DEL) $(DEPS)
+	@$(DEL) $(ASMS)
+	@$(DEL) $(LLVM_ASMS)
 	@$(ECHO) " | $(CLR_INVERT)deleted$(CLR_WHITE): $(NPWD) source objects"
 fclean: clean
 	@$(DEL) $(NAME)

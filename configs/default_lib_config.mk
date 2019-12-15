@@ -3,32 +3,39 @@ NPWD := $(CURDIR)/$(NAME)
 
 CC := clang
 
-CFLAGS_DEBUG := -glldb
-CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -Og -fsanitize=thread
-CFLAGS_OPTIMIZE := -march=native -mtune=native -Ofast -pipe -flto -fpic
-CFLAGS_ASSEMBLY := $(filter-out -flto,$(CFLAGS_OPTIMIZE)) -S -masm=intel
+CFLAGS_DEBUG         := -glldb
+CFLAGS_SANITIZE      := $(CFLAGS_DEBUG) -Og -fsanitize=thread
+CFLAGS_OPTIMIZE      := -march=native -mtune=native -Ofast -pipe -flto -fpic
+CFLAGS_ASSEMBLY      := $(filter-out -flto,$(CFLAGS_OPTIMIZE)) -S -masm=intel
+CFLAGS_LLVM_ASSEMBLY := $(filter-out -masm=intel,$(CFLAGS_ASSEMBLY)) -emit-llvm
 
 CFLAGS_OPTIONAL := $(CFLAGS_OPTIMIZE)
 CFLAGS := -Wall -Wextra -Werror -Wunused -MMD
+
+ASSEMBLY_FLAG := 0
+# 0 = no  assembly code generate
+# 1 = .s  assembly
+# 2 = .ll assembly
 
 ifneq (,$(wildcard ./includes))
 IFLAGS := $(addprefix -I,$(shell find ./includes -type d))
 endif
 
 ifneq (,$(wildcard ./srcs))
-SRCS := $(shell find srcs -name "*.c")
-OBJS := $(SRCS:.c=.o)
-ASMS := $(OBJS:.o=.s)
-DEPS := $(OBJS:.o=.d)
+SRCS      := $(shell find srcs -name "*.c")
+OBJS      := $(SRCS:.c=.o)
+ASMS      := $(SRCS:.c=.s)
+LLVM_ASMS := $(SRCS:.c=.ll)
+DEPS      := $(OBJS:.o=.d)
 endif
 
 ECHO := echo
 MAKE := make
-DEL := rm -rf
+DEL  := rm -rf
 
 NPROCS := 1
 
-ARFLAGS = -rcs
+ARFLAGS := -rcs
 
 UNAME_S := $(shell uname -s)
 # Linux Specifications:
@@ -37,9 +44,9 @@ ifeq ($(UNAME_S),Linux)
 # Remove this line if you have enabled -e option in echo command.
 ECHO += -e
 
-NPROCS := $(shell grep -c ^processor /proc/cpuinfo)
+NPROCS              := $(shell grep -c ^processor /proc/cpuinfo)
 MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
-AR := llvm-ar
+AR                  := llvm-ar
 endif
 
 # MacOS Specifications:
@@ -48,8 +55,8 @@ ifeq ($(UNAME_S),Darwin)
 #  or user don't have enought permissions to install latest version of GNUMake on system globally.
 # Remove this line if in your MacOS system already installed GNUMake 4.0.0 or later.
  ifneq ($(wildcard ~/.brew/bin/gmake),)
-	MAKE := ~/.brew/bin/gmake
-	NPROCS := $(shell sysctl -n hw.ncpu)
+	MAKE                := ~/.brew/bin/gmake
+	NPROCS              := $(shell sysctl -n hw.ncpu)
 	MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
  endif
 
@@ -58,13 +65,13 @@ endif
 
 MAKE += --no-print-directory
 
-CLR_INVERT := \033[7m
+CLR_INVERT    := \033[7m
 CLR_UNDERLINE := \033[4m
 
 CLR_GREEN := \033[32m
 CLR_WHITE := \033[0m
-CLR_BLUE := \033[34m
+CLR_BLUE  := \033[34m
 
-MSG_SUCCESS := [$(CLR_GREEN)✓$(CLR_WHITE)]
-MSG_BSUCCESS := [$(CLR_BLUE)✓$(CLR_WHITE)]
+MSG_SUCCESS        := [$(CLR_GREEN)✓$(CLR_WHITE)]
+MSG_BSUCCESS       := [$(CLR_BLUE)✓$(CLR_WHITE)]
 MSG_SUCCESS_NO_CLR := [✓]
