@@ -10,9 +10,9 @@ __attribute__((overloadable)) tpool_add_work
 # else
 tpool_add_work
 # endif
-(struct s_tpool *__restrict __nonnull tpool,
-	void (*__nonnull work_routine)(void *__restrict __nonnull),
-	void *__restrict __nonnull arg)
+(struct s_tpool *tp_restrict tp_Nonnull tpool,
+	void (*work_routine)(void *tp_restrict tp_Nonnull),
+	void *tp_restrict tp_Nonnull arg)
 {
 	size_t	i;
 
@@ -34,8 +34,8 @@ __attribute__((overloadable)) tpool_add_work
 # else
 tpool_add_w_work
 # endif
-(struct s_tpool *__restrict __nonnull tpool,
-struct s_work *__restrict __nonnull work)
+(struct s_tpool *tp_restrict tp_Nonnull tpool,
+struct s_work *tp_restrict tp_Nonnull work)
 {
 	size_t	i;
 

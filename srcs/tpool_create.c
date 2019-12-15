@@ -4,9 +4,10 @@
 # include "libtpool_internal.h"
 #undef LIBTPOOL_INTERNAL
 
-struct s_tpool *__nonnull	tpool_create(const size_t threads_count)
+struct s_tpool *tp_Nonnull
+tpool_create(const size_t threads_count)
 {
-	struct s_tpool *__restrict	tpool;
+	struct s_tpool *tp_restrict	tpool;
 	pthread_t					thread;
 	size_t						i;
 

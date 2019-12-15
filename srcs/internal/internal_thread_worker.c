@@ -4,7 +4,8 @@
 # include "libtpool_internal.h"
 #undef LIBTPOOL_INTERNAL
 
-static struct s_work	s_get_work(struct s_tpool *__restrict tpool)
+static struct s_work
+s_get_work(struct s_tpool *tp_restrict tpool)
 {
 	struct s_work	out;
 	size_t			i;
@@ -20,9 +21,10 @@ static struct s_work	s_get_work(struct s_tpool *__restrict tpool)
 	return (out);
 }
 
-void *__nullable	internal_thread_worker(void *__restrict __nonnull arg)
+void
+*internal_thread_worker(void *tp_restrict arg)
 {
-	struct s_tpool *__restrict	tpool = (struct s_tpool *__restrict)arg;
+	struct s_tpool *tp_restrict	tpool = (struct s_tpool *tp_restrict)arg;
 	struct s_work				work;
 
 	while (1) {

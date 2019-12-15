@@ -5,13 +5,15 @@
 #  error "do not include libtpool_s_work.h by yourself"
 # endif
 
+# include "libtpool_defs.h"
+
 # ifndef S_WORK
 #  define S_WORK
 
 struct	s_work
 {
-	void	(*__nullable routine)(void *__restrict __nonnull);
-	void	*__restrict __nullable arg;
+	void	(*tp_Nullable routine)(void *tp_restrict tp_Nonnull);
+	void	*tp_restrict tp_Nullable arg;
 };
 
 # endif /* S_WORK */
