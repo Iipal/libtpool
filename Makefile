@@ -84,11 +84,14 @@ assembly: multi
 llvm_assembly_all: pre
 llvm_assembly: multi
 
-clean:
-	@$(DEL) $(OBJS)
-	@$(DEL) $(OBJS:%.o=%.d)
-	@$(DEL) $(ASMS)
+clean_llvm_assembly:
 	@$(DEL) $(LLVM_ASMS)
+clean_assembly:
+	@$(DEL) $(ASMS)
+clean_deps:
+	@$(DEL) $(OBJS:%.o=%.d)
+clean: clean_deps clean_assembly clean_llvm_assembly
+	@$(DEL) $(OBJS)
 	@$(ECHO) " | $(CLR_INVERT)deleted$(CLR_WHITE): $(NPWD) source objects"
 fclean: clean
 	@$(DEL) $(NAME)
@@ -102,7 +105,7 @@ norme:
 	@norminette includes/
 	@norminette $(SRCS)
 
-.PHONY: re fclean clean norme del pre sanitize sanitize_all debug debug_all STATUS
+.PHONY: re fclean clean clean_assembly clean_llvm_assembly clean_deps assembly assembly_all llvm_assembly llvm_assembly_all norme del pre sanitize sanitize_all debug debug_all STATUS
 .SUFFIXES:
 .SUFFIXES: .o .S .ll .d
 .EXPORT_ALL_VARIABLES:
