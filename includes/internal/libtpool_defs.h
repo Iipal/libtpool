@@ -6,6 +6,7 @@
 # endif
 
 # if defined __linux__
+#  include <sys/cdefs.h>
 
 #  define tp_Nonnull _Nonnull
 #  define tp_Nullable _Nullable
