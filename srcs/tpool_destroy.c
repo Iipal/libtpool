@@ -6,11 +6,8 @@
 
 void	tpool_destroy(struct s_tpool *tp_restrict tp_Nonnull tpool)
 {
-	size_t	i;
-
-	i = ~0UL;
 	pthread_mutex_lock(&tpool->pool_mutex);
-	tpool->stop = true;
+	tpool->stop = 1;
 	pthread_cond_broadcast(&tpool->work_cond);
 	pthread_mutex_unlock(&tpool->pool_mutex);
 	tpool_wait(tpool);

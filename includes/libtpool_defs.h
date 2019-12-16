@@ -1,10 +1,6 @@
 #ifndef LIBTPOOL_DEFS_H
 # define LIBTPOOL_DEFS_H
 
-# if !(defined(LIBTPOOL_H) || defined(LIBTPOOL_INTERNAL))
-#  error "include libtpool.h only"
-# endif
-
 # if defined __linux__
 #  include <sys/cdefs.h>
 

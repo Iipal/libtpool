@@ -1,4 +1,4 @@
-NAME := libft.a
+NAME := libtpool.a
 NPWD := $(CURDIR)/$(NAME)
 
 CC     := clang
