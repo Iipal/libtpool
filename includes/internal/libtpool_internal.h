@@ -28,8 +28,10 @@ struct	s_tpool_work
 
 # if defined __APPLE__
 #  define TPOOL_ALIGN_SIZE 8
-# elif defined __linu__
-#  define TPOOL_ALIGN_SIZE 6
+# elif defined __linux__
+#  define TPOOL_ALIGN_SIZE 4
+# else
+#  define TPOOL_ALIGN_SIZE 1
 # endif
 
 struct s_tpool
