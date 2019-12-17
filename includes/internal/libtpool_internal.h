@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdatomic.h>
 #include <stdalign.h>
 #include <assert.h>
 
