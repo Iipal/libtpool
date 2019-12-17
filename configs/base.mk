@@ -1,6 +1,6 @@
 .EXPORT_ALL_VARIABLES:
 
-NAME := libtpool.a
+NAME := $(notdir $(CURDIR)).a
 NPWD := $(CURDIR)/$(NAME)
 
 # all source code .c files must to places in to "srcs" folder(or sub-dirs) only.

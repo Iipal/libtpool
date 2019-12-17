@@ -1,16 +1,14 @@
 .PHONY: STATUS_START
 STATUS_START:
  ifneq (,$(OBJS))
-	@$(ECHO) " | ------------------------"
+	@$(ECHO) " | ---------------------- |"
 	@$(ECHO) " | making: $(CLR_UNDERLINE)$(NAME)$(CLR_WHITE) ..."
-	@$(ECHO) " | ------------------------"
- else
-	@$(ECHO) " | ------------------------"
+	@$(ECHO) " | ---------------------- |"
  endif
 
 .PHONY: STATUS_END
 STATUS_END:
-	@$(ECHO) "/ -------------------------"
+	@$(ECHO) "/ ----------------------- |"
  ifneq (,$(NAME))
   ifneq (,$(OBJS))
 	@$(ECHO) "| compiled                : $(NAME) $(MSG_SUCCESS)"
@@ -33,4 +31,4 @@ STATUS_END:
 	@$(ECHO) "| archiver          flags : $(CLR_UNDERLINE)$(ARFLAGS)$(CLR_WHITE)"
   endif
  endif
-	@$(ECHO) "\\ -------------------------"
+	@$(ECHO) "\\ ----------------------- |"
