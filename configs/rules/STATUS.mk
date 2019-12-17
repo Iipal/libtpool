@@ -1,9 +1,9 @@
 .PHONY: STATUS_START
 STATUS_START:
  ifneq (,$(OBJS))
-	@$(ECHO) " | -------"
+	@$(ECHO) " | ------------------------"
 	@$(ECHO) " | making: $(CLR_UNDERLINE)$(NAME)$(CLR_WHITE) ..."
-	@$(ECHO) " | -------"
+	@$(ECHO) " | ------------------------"
  else
 	@$(ECHO) " | ------------------------"
  endif

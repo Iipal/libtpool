@@ -1,6 +1,5 @@
 include configs/base.mk
-include configs/archiver.mk
-include configs/compiler.mk
+include configs/compilation.mk
 include configs/os.mk
 include configs/colors.mk
 
@@ -31,6 +30,6 @@ $(OBJS): %.o: %.c
 $(ASMS): %.S: %.c
 	@$(call compilation,$<,$@)
 
--include configs/STATUS.mk
--include configs/optional_rules.mk
--include configs/cleaners.mk
+-include configs/rules/STATUS.mk
+-include configs/rules/optional.mk
+-include configs/rules/cleaners.mk
