@@ -17,7 +17,7 @@ t_tpool *tp_Nonnull
 tpool_create(const size_t threads_count);
 
 void
-tpool_add_work(struct s_tpool *tp_restrict tp_Nonnull tpool,
+tpool_add_work(t_tpool *tp_restrict tp_Nonnull tpool,
 	void (*tp_Nonnull work_routine)(void *tp_restrict tp_Nonnull),
 	void *tp_restrict tp_Nonnull arg);
 
