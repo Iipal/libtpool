@@ -1,5 +1,6 @@
-ECHO    := echo
 MAKE    := make
+ECHO    := echo
+DEL     := rm -rf
 NPROCS  := 1
 UNAME_S := $(shell uname -s)
 # Linux Specifications:
@@ -10,7 +11,6 @@ ECHO += -e
 
 NPROCS              := $(shell grep -c ^processor /proc/cpuinfo)
 MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
-AR                  := llvm-ar
 endif
 
 # MacOS Specifications:
@@ -23,8 +23,6 @@ ifeq ($(UNAME_S),Darwin)
 	NPROCS              := $(shell sysctl -n hw.ncpu)
 	MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
  endif
-
-AR := ar
 endif
 
 MAKE += --no-print-directory
