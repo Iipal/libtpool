@@ -28,6 +28,7 @@ STATUS_END:
  endif
  ifneq (,$(ARFLAGS))
   ifneq (,$(OBJS))
+	@$(ECHO) "| archiver                : $(CLR_UNDERLINE)$(AR)$(CLR_WHITE)"
 	@$(ECHO) "| archiver          flags : $(CLR_UNDERLINE)$(ARFLAGS)$(CLR_WHITE)"
   endif
  endif
