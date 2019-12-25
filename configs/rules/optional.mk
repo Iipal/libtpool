@@ -13,15 +13,21 @@ make_optional:
 	@$(eval ASMS:=$(OBJS:.o=.S))
 	@$(eval OBJS:=)
  endif
+ ifneq (,$(filter $(MAKECMDGOALS),debug_assembly debug_assembly_all))
+	@$(eval CFLAGS_OPTIONAL:=$(CFLAGS_DEBUG_ASSEMBLY))
+	@$(eval DEFINES:=$(shell echo $(basename $(NAME)) | tr a-z A-Z)_DEBUG_ASSEMBLY)
+	@$(eval ASMS:=$(OBJS:.o=.S))
+	@$(eval OBJS:=)
+ endif
 
-.PHONY: debug debug_all
 debug_all: pre
 debug: multi
 
-.PHONY: sanitize sanitize_all
 sanitize_all: pre
 sanitize: multi
 
-.PHONY: assembly assembly_all
 assembly_all: pre
 assembly: multi
+
+debug_assembly_all: pre
+debug_assembly: multi

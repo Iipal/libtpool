@@ -31,12 +31,13 @@ IFLAGS += $(addprefix -I,$(shell find $(foreach d,$(HEADER_DEPS),$(abspath $d)) 
 endif
 
 # Compiler settings.
-CC              := clang
-CFLAGS          := -Wall -Wextra -Werror -Wunused -MMD
-CFLAGS_DEBUG    := -glldb -Og
-CFLAGS_SANITIZE := $(CFLAGS_DEBUG) -fsanitize=address
-CFLAGS_OPTIMIZE := -march=native -mtune=native -Ofast -pipe -flto -fpic
-CFLAGS_ASSEMBLY := $(filter-out -flto -fpic,$(CFLAGS_OPTIMIZE)) -S -masm=intel
+CC                    := clang
+CFLAGS                := -Wall -Wextra -Werror -Wunused -MMD
+CFLAGS_DEBUG          := -g3
+CFLAGS_SANITIZE       := $(CFLAGS_DEBUG) -fsanitize=address
+CFLAGS_OPTIMIZE       := -march=native -mtune=native -Ofast -pipe -flto -fpic
+CFLAGS_ASSEMBLY       := $(filter-out -flto -fpic,$(CFLAGS_OPTIMIZE)) -S -masm=intel
+CFLAGS_DEBUG_ASSEMBLY := $(CFLAGS_DEBUG) -S -masm=intel
 
 CFLAGS_OPTIONAL := $(CFLAGS_OPTIMIZE)
 
