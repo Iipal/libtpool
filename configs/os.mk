@@ -1,28 +1,31 @@
-MAKE    := make
-ECHO    := echo
 DEL     := rm -rf
+ECHO    := echo
 NPROCS  := 1
 UNAME_S := $(shell uname -s)
+
 # Linux Specifications:
 ifeq ($(UNAME_S),Linux)
-# Only for Red-Hat systems where -e param isn't enabled by default in echo built-in command.
-# Remove this line if you have enabled -e option in echo command.
-ECHO += -e
-
-NPROCS              := $(shell grep -c ^processor /proc/cpuinfo)
-MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
+# if it's not Debian-based distro needs to add "-e" flag for correct work 'echo' with Escape-sequences
+ ifeq (,$(shell grep -Ei 'debian|buntu|mint' /etc/*release))
+	ECHO += -e
+ endif
+NPROCS   := $(shell grep -c ^processor /proc/cpuinfo)
 endif
 
 # MacOS Specifications:
 ifeq ($(UNAME_S),Darwin)
-# Only for MacOS where brew install path on home directory
-#  or user don't have enought permissions to install latest version of GNUMake on system globally.
-# Remove this line if in your MacOS system already installed GNUMake 4.0.0 or later.
- ifneq ($(wildcard ~/.brew/bin/gmake),)
-	MAKE                := ~/.brew/bin/gmake
-	NPROCS              := $(shell sysctl -n hw.ncpu)
-	MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS) -Otarget
+# Only if you have installed gmake(GNU make) on ~/.brew/bin folder via 'brew install make'.
+# Required for MacOS systems whereby default installed 'make --version' <=3.8.1
+#  and that doesn't have -O option for correct parallel make output.
+ ifneq (,$(wildcard ~/.brew/bin/gmake))
+	MAKE := ~/.brew/bin/gmake
  endif
+NPROCS   := $(shell sysctl -n hw.ncpu)
 endif
 
-MAKE += --no-print-directory
+# Additional make settings:
+MAKE                += --no-print-directory
+MAKE_PARALLEL_FLAGS := -j $(NPROCS) -l $(NPROCS)
+ifeq (4.0.0,$(firstword $(sort $(shell $(MAKE) --version | awk 'NR==1 {print $3}') 4.0.0)))
+MAKE_PARALLEL_FLAGS += -Otarget
+endif
