@@ -4,13 +4,13 @@
 # include "libtpool_internal.h"
 #undef LIBTPOOL_INTERNAL
 
-void *tp_Nullable
-internal_thread_worker(void *tp_restrict tp_Nonnull arg);
+void*
+internal_thread_worker(void *restrict arg);
 
-struct s_tpool *tp_Nonnull
+struct s_tpool*
 tpool_create(const size_t threads_count)
 {
-	struct s_tpool *tp_restrict tpool;
+	struct s_tpool *restrict tpool;
 
 	assert(threads_count != 0UL);
 	assert((tpool = calloc(1UL, sizeof(*tpool))));
@@ -29,7 +29,7 @@ tpool_create(const size_t threads_count)
 }
 
 static struct s_tpool_work
-internal_get_work(struct s_tpool *tp_restrict tpool)
+internal_get_work(struct s_tpool *restrict tpool)
 {
 	struct s_tpool_work out = { NULL, NULL };
 	size_t i;
@@ -43,13 +43,13 @@ internal_get_work(struct s_tpool *tp_restrict tpool)
 	return (out);
 }
 
-void *tp_Nullable
-internal_thread_worker(void *tp_restrict tp_Nonnull arg)
+void*
+internal_thread_worker(void *restrict arg)
 {
-	struct s_tpool *tp_restrict tpool = (struct s_tpool *tp_restrict)arg;
+	struct s_tpool *restrict tpool = (struct s_tpool *restrict)arg;
 	struct s_tpool_work work;
 
-	while (1) {
+	while (true) {
 		pthread_mutex_lock(&tpool->pool_mutex);
 		if (tpool->stop)
 		 	break ;

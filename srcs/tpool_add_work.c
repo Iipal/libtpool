@@ -4,9 +4,9 @@
 # include "libtpool_internal.h"
 #undef LIBTPOOL_INTERNAL
 
-void	tpool_add_work(struct s_tpool *tp_restrict tp_Nonnull tpool,
-			void (*tp_Nonnull work_routine)(void *tp_restrict tp_Nonnull),
-			void *tp_restrict tp_Nonnull arg)
+void	tpool_add_work(struct s_tpool *restrict tpool,
+			void (*work_routine)(void *restrict),
+			void *restrict arg)
 {
 	size_t i;
 

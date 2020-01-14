@@ -2,33 +2,31 @@
 # define LIBTPOOL_H
 
 # ifndef _GNU_SOURCE
-#  define ONLY_LOCAL_GNU_SOURCE_DEFINE
+#  define _LTPOOL_ONLY_LOCAL_GNU_SOURCE_DEFINE
 #  define _GNU_SOURCE
 # endif
-
-# include "libtpool_defs.h"
 
 # include <sys/types.h>
 
 struct s_tpool;
-typedef struct s_tpool t_tpool;
+typedef struct s_tpool TPool;
 
-t_tpool *tp_Nonnull
+TPool*
 tpool_create(const size_t threads_count);
 
 void
-tpool_add_work(t_tpool *tp_restrict tp_Nonnull tpool,
-	void (*tp_Nonnull work_routine)(void *tp_restrict tp_Nonnull),
-	void *tp_restrict tp_Nonnull arg);
+tpool_add_work(TPool *restrict tpool,
+	void (*work_routine)(void *restrict),
+	void *restrict arg);
 
 void
-tpool_wait(t_tpool *tp_restrict tp_Nonnull tpool);
+tpool_wait(TPool *restrict tpool);
 
 void
-tpool_destroy(t_tpool *tp_restrict tp_Nonnull tpool);
+tpool_destroy(TPool *restrict tpool);
 
-# ifdef ONLY_LOCAL_GNU_SOURCE_DEFINE
-#  undef ONLY_LOCAL_GNU_SOURCE_DEFINE
+# ifdef _LTPOOL_ONLY_LOCAL_GNU_SOURCE_DEFINE
+#  undef _LTPOOL_ONLY_LOCAL_GNU_SOURCE_DEFINE
 #  undef _GNU_SOURCE
 # endif
 
